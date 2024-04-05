@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 //@desc Register a user
 //@route GET /api/users/register
 //@access public
@@ -41,6 +42,23 @@ const registerUser = asyncHandler(async (req,res) =>{
 //@access public
 
 const loginUser = asyncHandler(async (req,res) =>{
+    const {email,password} = req.body;
+    if (!email || !password){
+        res.status(400);
+        throw new Error("All fileds must be filled!")
+    }
+    const user = await User.findOne({email});
+    if (user && (await bcrypt.compare(password,user.password))){
+        const accessToken = jwt.sign({
+            user:{
+                username:user.username,
+                email:user.email,
+                id:user.id,
+            },
+        });
+        res.status(200).json({accessToken});
+    }
+    //compare passwod with hashed password
     res.json({messege: "Login user"})
 });
 
