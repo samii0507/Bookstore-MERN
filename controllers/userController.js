@@ -55,12 +55,19 @@ const loginUser = asyncHandler(async (req,res) =>{
                 email:user.email,
                 id:user.id,
             },
-        });
+        },process.env.ACCESS_TOKEN_SECERT,
+        {expiresIn:"1m"}
+        );
         res.status(200).json({accessToken});
+    } else {
+        res.status(401)
+        throw new Error("Email or password is not valid")
     }
     //compare passwod with hashed password
-    res.json({messege: "Login user"})
-});
+   
+}
+
+);
 
 //@desc Current user info
 //@route POST /api/users/current
